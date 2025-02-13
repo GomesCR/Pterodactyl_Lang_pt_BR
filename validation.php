@@ -19,13 +19,13 @@ return [
     'alpha' => 'O campo :attribute só pode conter letras.',
     'alpha_dash' => 'O campo :attribute só pode conter letras, números e traços.',
     'alpha_num' => 'O campo :attribute só pode conter letras e números.',
-    'array' => 'O campo :attribute deve ser um array.',
+    'array' => 'O campo :attribute deve ser uma matriz.',
     'before' => 'O campo :attribute deve ser uma data anterior a :date.',
     'before_or_equal' => 'O campo :attribute deve ser uma data anterior ou igual a :date.',
     'between' => [
         'numeric' => 'O campo :attribute deve estar entre :min e :max.',
         'file' => 'O campo :attribute deve estar entre :min e :max kilobytes.',
-        'string' => 'O campo :attribute deve ter entre :min e :max caracteres.',
+        'string' => 'O campo :attribute deve estar entre :min e :max caracteres.',
         'array' => 'O campo :attribute deve ter entre :min e :max itens.',
     ],
     'boolean' => 'O campo :attribute deve ser verdadeiro ou falso.',
@@ -40,7 +40,7 @@ return [
     'email' => 'O campo :attribute deve ser um endereço de e-mail válido.',
     'exists' => 'O :attribute selecionado é inválido.',
     'file' => 'O campo :attribute deve ser um arquivo.',
-    'filled' => 'O campo :attribute é obrigatório.',
+    'filled' => 'O campo :attribute deve ter um valor.',
     'image' => 'O campo :attribute deve ser uma imagem.',
     'in' => 'O :attribute selecionado é inválido.',
     'in_array' => 'O campo :attribute não existe em :other.',
@@ -50,16 +50,16 @@ return [
     'max' => [
         'numeric' => 'O campo :attribute não pode ser maior que :max.',
         'file' => 'O campo :attribute não pode ser maior que :max kilobytes.',
-        'string' => 'O campo :attribute não pode ter mais que :max caracteres.',
+        'string' => 'O campo :attribute não pode ser maior que :max caracteres.',
         'array' => 'O campo :attribute não pode ter mais que :max itens.',
     ],
     'mimes' => 'O campo :attribute deve ser um arquivo do tipo: :values.',
     'mimetypes' => 'O campo :attribute deve ser um arquivo do tipo: :values.',
     'min' => [
-        'numeric' => 'O campo :attribute deve ser no mínimo :min.',
-        'file' => 'O campo :attribute deve ter no mínimo :min kilobytes.',
-        'string' => 'O campo :attribute deve ter no mínimo :min caracteres.',
-        'array' => 'O campo :attribute deve ter no mínimo :min itens.',
+        'numeric' => 'O campo :attribute deve ser pelo menos :min.',
+        'file' => 'O campo :attribute deve ter pelo menos :min kilobytes.',
+        'string' => 'O campo :attribute deve ter pelo menos :min caracteres.',
+        'array' => 'O campo :attribute deve ter pelo menos :min itens.',
     ],
     'not_in' => 'O :attribute selecionado é inválido.',
     'numeric' => 'O campo :attribute deve ser um número.',
@@ -81,8 +81,8 @@ return [
     ],
     'string' => 'O campo :attribute deve ser uma string.',
     'timezone' => 'O campo :attribute deve ser uma zona válida.',
-    'unique' => 'O campo :attribute já está sendo utilizado.',
-    'uploaded' => 'O campo :attribute falhou no upload.',
+    'unique' => 'O :attribute já está sendo utilizado.',
+    'uploaded' => 'O :attribute falhou ao ser enviado.',
     'url' => 'O formato do campo :attribute é inválido.',
 
     /*
@@ -95,6 +95,12 @@ return [
     | ao invés de "email". Isso simplesmente nos ajuda a tornar as mensagens mais claras.
     |
     */
+
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
 
     'attributes' => [],
 

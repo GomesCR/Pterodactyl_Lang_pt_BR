@@ -8,90 +8,130 @@ Este é o pacote de tradução em Português do Brasil para o Painel Pterodactyl
 - Acesso SSH ao servidor
 - Permissões de root/sudo
 
-## 🚀 Instalação Corrigida
+## 🚀 Instalação Correta (Atualizada)
 
-1. Primeiro, restaure a pasta 'en' se foi removida (é necessária para o funcionamento correto):
+1. Acesse a pasta raiz do Pterodactyl:
 ```bash
 cd /var/www/pterodactyl
-git checkout resources/lang/en
 ```
 
-2. Instale os arquivos de tradução:
+2. Faça backup das configurações atuais:
+```bash
+cp -r resources/lang/en resources/lang/en_backup
+cp .env .env_backup
+```
+
+3. Instale os arquivos de tradução:
 ```bash
 # Remova instalação anterior do português (se existir)
 rm -rf resources/lang/pt
 
 # Clone o repositório na pasta correta
 git clone https://github.com/GomesCR/Pterodactyl_Lang_pt_BR.git resources/lang/pt
+```
 
-# Ajuste as permissões
+4. Configure o Laravel para usar português como idioma padrão:
+```bash
+# Edite o arquivo .env
+sed -i 's/APP_LOCALE=en/APP_LOCALE=pt/g' .env
+
+# Crie o arquivo de configuração de idiomas
+cat > config/locale.php << 'EOL'
+<?php
+return [
+    'languages' => [
+        'pt' => [
+            'name' => 'Português do Brasil',
+            'locale' => 'pt_BR',
+        ],
+    ],
+];
+EOL
+```
+
+5. Ajuste as permissões e limpe os caches:
+```bash
+# Ajuste permissões
 chown -R www-data:www-data resources/lang/pt
 find resources/lang/pt -type f -exec chmod 644 {} \;
 find resources/lang/pt -type d -exec chmod 755 {} \;
-```
 
-3. Configure o Laravel para usar português como idioma padrão:
-```bash
-# Edite o arquivo .env na raiz do Pterodactyl
-sed -i 's/APP_LOCALE=en/APP_LOCALE=pt/g' .env
-
-# Edite config/app.php se necessário
-# Procure e altere as seguintes linhas:
-#   'locale' => 'pt',
-#   'fallback_locale' => 'en',
-```
-
-4. Limpe todos os caches (importante executar TODOS os comandos):
-```bash
-php artisan config:clear
-php artisan cache:clear
+# Limpe todos os caches
 php artisan view:clear
+php artisan cache:clear
+php artisan config:clear
 php artisan route:clear
 composer dump-autoload -o
 php artisan optimize:clear
-```
 
-5. Reinicie os serviços:
-```bash
+# Reinicie o PHP-FPM e o servidor web
 systemctl restart php8.1-fpm  # Ajuste para sua versão do PHP
 systemctl restart nginx
 ```
 
-6. Verifique os logs em tempo real para identificar possíveis erros:
+6. Verifique a instalação:
 ```bash
-tail -f /var/www/pterodactyl/storage/logs/laravel.log
-```
-
-## 🔍 Verificação da Instalação
-
-Execute este comando para verificar se o Laravel reconhece o idioma português:
-```bash
-cd /var/www/pterodactyl
+# Entre no tinker do Laravel
 php artisan tinker
+
+# Verifique o idioma atual
 >>> app()->getLocale();  # Deve retornar 'pt'
->>> trans('test.test_message');  # Deve retornar a mensagem em português
+
+# Teste uma tradução
+>>> trans('strings.email');  # Deve retornar a versão em português
 ```
 
-## ⚠️ Solução de Problemas Comum
+## ⚠️ Solução de Problemas Comuns
 
-1. Se a tradução não aparece:
-   - Verifique se todos os arquivos de tradução têm a extensão `.php`
-   - Confirme se todos os arquivos começam com `<?php` e retornam um array
-   - Verifique se as chaves de tradução correspondem exatamente às do inglês
-   - Certifique-se de que não há erros de sintaxe PHP nos arquivos
+1. Se o idioma não muda:
+   - Verifique se o arquivo `config/locale.php` foi criado corretamente
+   - Confirme se APP_LOCALE está como 'pt' no arquivo .env
+   - Verifique se todos os arquivos de tradução estão na pasta correta: `resources/lang/pt/`
+   - Certifique-se que as permissões estão corretas (proprietário www-data)
 
-2. Se o painel continua em inglês:
-   - Verifique se APP_LOCALE está definido como 'pt' no arquivo .env
-   - Confirme se o usuário tem permissão para alterar o idioma
-   - Limpe o cache do navegador e faça logout/login
+2. Se algumas strings continuam em inglês:
+   - Compare os arquivos de tradução com os originais em `resources/lang/en/`
+   - Verifique se todos os arquivos de tradução necessários estão presentes
+   - Certifique-se que as chaves nos arquivos de tradução correspondem exatamente às originais
 
-3. Para forçar o português como idioma padrão para todos os usuários:
+3. Se o painel trava ou apresenta erros:
+   - Verifique os logs em `storage/logs/laravel.log`
+   - Confirme se todos os arquivos PHP estão sintaticamente corretos
+   - Verifique se o cache foi limpo corretamente
+
+4. Para forçar o português globalmente:
 ```php
 // Em config/app.php
-'locale' => 'pt',
-'fallback_locale' => 'pt',  // Mude também o fallback para pt
-'available_locales' => ['pt'],  // Deixe apenas português como opção
+return [
+    'locale' => 'pt',
+    'fallback_locale' => 'pt',
+    'available_locales' => ['pt'],
+];
 ```
+
+## 📝 Estrutura dos Arquivos
+
+A estrutura correta dos arquivos deve ser:
+```
+resources/lang/pt/
+├── activity.php
+├── admin/
+├── auth.php
+├── command/
+├── dashboard/
+├── exceptions.php
+├── pagination.php
+├── passwords.php
+├── server/
+├── strings.php
+└── validation.php
+```
+
+Cada arquivo deve:
+1. Começar com `<?php`
+2. Retornar um array com as traduções
+3. Manter as mesmas chaves dos arquivos em inglês
+4. Ter permissões 644 (arquivos) ou 755 (diretórios)
 
 ## 🔧 Configuração
 
