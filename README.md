@@ -12,30 +12,34 @@ Este é o pacote de tradução em Português do Brasil para o Painel Pterodactyl
 
 1. Acesse a pasta de recursos do seu painel Pterodactyl:
 ```bash
-cd /var/www/pterodactyl/resources/lang
-```
-
-2. Crie a pasta 'pt' para o idioma português:
-```bash
-mkdir pt
-```
-
-3. Faça o download dos arquivos de tradução:
-```bash
-cd pt
-git clone https://github.com/GomesCR/Pterodactyl_Lang_pt_BR.git .
-```
-
-4. Limpe o cache do Laravel e as visualizações compiladas:
-```bash
 cd /var/www/pterodactyl
-php artisan view:clear
-php artisan cache:clear
 ```
 
-5. Ajuste as permissões dos arquivos:
+2. Faça backup dos arquivos de linguagem existentes (caso necessário):
+```bash
+cp -r resources/lang/pt resources/lang/pt_backup
+```
+
+3. Baixe e instale os arquivos de tradução:
+```bash
+cd resources/lang
+rm -rf pt  # Remove pasta pt existente se houver
+git clone https://github.com/GomesCR/Pterodactyl_Lang_pt_BR.git pt
+```
+
+4. Corrija as permissões e limpe os caches:
 ```bash
 chown -R www-data:www-data /var/www/pterodactyl/*
+chmod -R 755 storage/* bootstrap/cache
+php artisan view:clear
+php artisan cache:clear
+composer dump-autoload
+```
+
+5. Reinicie os serviços:
+```bash
+systemctl restart nginx
+systemctl restart php8.1-fpm  # Ajuste a versão do PHP conforme sua instalação
 ```
 
 ## 🔧 Configuração
@@ -53,6 +57,35 @@ Cada usuário pode selecionar o idioma português individualmente:
 3. Selecione 'Account'
 4. Na seção 'Language', escolha 'Português do Brasil (pt)'
 5. Clique em 'Save' para aplicar
+
+## ⚠️ Solução de Problemas
+
+Se a linguagem continuar voltando para inglês:
+
+1. Verifique se o arquivo `config/app.php` tem a configuração correta:
+```php
+'locale' => 'pt',
+'fallback_locale' => 'en',
+```
+
+2. Verifique as permissões dos arquivos:
+```bash
+chown -R www-data:www-data /var/www/pterodactyl/resources/lang/pt
+chmod -R 644 /var/www/pterodactyl/resources/lang/pt/*
+```
+
+3. Limpe todos os caches do Laravel:
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+```
+
+4. Se ainda persistir, tente:
+   - Limpar o cache do navegador
+   - Fazer logout e login novamente no painel
+   - Verificar se todos os arquivos de tradução estão presentes e com conteúdo correto
 
 ## ⚠️ Observações
 
