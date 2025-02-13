@@ -8,38 +8,89 @@ Este é o pacote de tradução em Português do Brasil para o Painel Pterodactyl
 - Acesso SSH ao servidor
 - Permissões de root/sudo
 
-## 🚀 Instalação
+## 🚀 Instalação Corrigida
 
-1. Acesse a pasta de recursos do seu painel Pterodactyl:
+1. Primeiro, restaure a pasta 'en' se foi removida (é necessária para o funcionamento correto):
 ```bash
 cd /var/www/pterodactyl
+git checkout resources/lang/en
 ```
 
-2. Faça backup dos arquivos de linguagem existentes (caso necessário):
+2. Instale os arquivos de tradução:
 ```bash
-cp -r resources/lang/pt resources/lang/pt_backup
+# Remova instalação anterior do português (se existir)
+rm -rf resources/lang/pt
+
+# Clone o repositório na pasta correta
+git clone https://github.com/GomesCR/Pterodactyl_Lang_pt_BR.git resources/lang/pt
+
+# Ajuste as permissões
+chown -R www-data:www-data resources/lang/pt
+find resources/lang/pt -type f -exec chmod 644 {} \;
+find resources/lang/pt -type d -exec chmod 755 {} \;
 ```
 
-3. Baixe e instale os arquivos de tradução:
+3. Configure o Laravel para usar português como idioma padrão:
 ```bash
-cd resources/lang
-rm -rf pt  # Remove pasta pt existente se houver
-git clone https://github.com/GomesCR/Pterodactyl_Lang_pt_BR.git pt
+# Edite o arquivo .env na raiz do Pterodactyl
+sed -i 's/APP_LOCALE=en/APP_LOCALE=pt/g' .env
+
+# Edite config/app.php se necessário
+# Procure e altere as seguintes linhas:
+#   'locale' => 'pt',
+#   'fallback_locale' => 'en',
 ```
 
-4. Corrija as permissões e limpe os caches:
+4. Limpe todos os caches (importante executar TODOS os comandos):
 ```bash
-chown -R www-data:www-data /var/www/pterodactyl/*
-chmod -R 755 storage/* bootstrap/cache
-php artisan view:clear
+php artisan config:clear
 php artisan cache:clear
-composer dump-autoload
+php artisan view:clear
+php artisan route:clear
+composer dump-autoload -o
+php artisan optimize:clear
 ```
 
 5. Reinicie os serviços:
 ```bash
+systemctl restart php8.1-fpm  # Ajuste para sua versão do PHP
 systemctl restart nginx
-systemctl restart php8.1-fpm  # Ajuste a versão do PHP conforme sua instalação
+```
+
+6. Verifique os logs em tempo real para identificar possíveis erros:
+```bash
+tail -f /var/www/pterodactyl/storage/logs/laravel.log
+```
+
+## 🔍 Verificação da Instalação
+
+Execute este comando para verificar se o Laravel reconhece o idioma português:
+```bash
+cd /var/www/pterodactyl
+php artisan tinker
+>>> app()->getLocale();  # Deve retornar 'pt'
+>>> trans('test.test_message');  # Deve retornar a mensagem em português
+```
+
+## ⚠️ Solução de Problemas Comum
+
+1. Se a tradução não aparece:
+   - Verifique se todos os arquivos de tradução têm a extensão `.php`
+   - Confirme se todos os arquivos começam com `<?php` e retornam um array
+   - Verifique se as chaves de tradução correspondem exatamente às do inglês
+   - Certifique-se de que não há erros de sintaxe PHP nos arquivos
+
+2. Se o painel continua em inglês:
+   - Verifique se APP_LOCALE está definido como 'pt' no arquivo .env
+   - Confirme se o usuário tem permissão para alterar o idioma
+   - Limpe o cache do navegador e faça logout/login
+
+3. Para forçar o português como idioma padrão para todos os usuários:
+```php
+// Em config/app.php
+'locale' => 'pt',
+'fallback_locale' => 'pt',  // Mude também o fallback para pt
+'available_locales' => ['pt'],  // Deixe apenas português como opção
 ```
 
 ## 🔧 Configuração
